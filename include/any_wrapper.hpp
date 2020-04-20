@@ -28,12 +28,21 @@ struct any_wrapper : std::any{
 	template<typename T>
 	void setData(const std::string& value){
 		std::stringstream svalue {value};
-		svalue >> *(std::any_cast<T>(this));
+		if constexpr (std::is_pointer_v<T>){
+			svalue >> **(std::any_cast<T>(this));
+		}else{
+			svalue >> *(std::any_cast<T>(this));
+		}
 	}
+
 
 	template<typename T>
 	std::ostream& printData(std::ostream& stream) const {
-		stream << *std::any_cast<T>(this);
+		if constexpr (std::is_pointer_v<T>){
+			stream << **std::any_cast<T>(this);
+		}else{
+			stream << *std::any_cast<T>(this);
+		}
 		return stream;
 	}
 
@@ -46,7 +55,12 @@ struct any_wrapper : std::any{
 
 template<>
 inline void any_wrapper::setData<std::string>(const std::string& value){
-	*(std::any_cast<std::string>(this)) = value;
+	*std::any_cast<std::string>(this) = value;
+}
+
+template<>
+inline void any_wrapper::setData<std::string*>(const std::string& value){
+	**(std::any_cast<std::string*>(this)) = value;
 }
 
 }

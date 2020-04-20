@@ -5,20 +5,19 @@
 
 #include <confparser.hpp>
 
-
-
 int main(){
 	confparser::Config conf;
-	conf.addParam("valueInt", 0);
-	conf.addParam("valueFloat", 0.0f);
-	conf.addParam("ValueString", std::string(""));
+	int myint = 0;
+	std::string mystring = "string";
+	conf.bindParam("valueInt", myint);
+	conf.addParam("valueFloat", 10.0f);
+	conf.bindParam("ValueString", mystring);
 	std::cout << conf << '\n';
 	conf.loadFile("config.ini");
+	
 	std::cout << conf << '\n';
 
-
-	int valueInt {conf.getParam<int>("valueInt")};
-	std::cout << valueInt << '\n';
+	std::cout << myint << '\n';
 
 	return 0;
 }

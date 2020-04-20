@@ -15,7 +15,12 @@ struct Config{
 	void loadFile(std::string_view filename);
 
 	template<typename T>
-	void addParam(std::string_view param, T value){
+	void bindParam(std::string_view param, T& value){
+		params.emplace(param.data(),&value);
+	}
+
+	template<typename T>
+	void addParam(std::string_view param, T&& value){
 		params.emplace(param.data(),value);
 	}
 
