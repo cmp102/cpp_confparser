@@ -6,18 +6,29 @@
 #include <confparser.hpp>
 
 int main(){
+
+	//Variables to bind
+	int			myint		= 0;
+	std::string	mystring	= "string";
+	float			myfloat	= 10;
+
 	confparser::Config conf;
-	int myint = 0;
-	std::string mystring = "string";
-	conf.bindParam("valueInt", myint);
-	conf.addParam("valueFloat", 10.0f);
-	conf.bindParam("ValueString", mystring);
-	std::cout << conf << '\n';
+
+	conf.bindParam("valueInt"		,myint);
+	conf.bindParam("valueFloat"	,myfloat);
+	conf.bindParam("ValueString"	,mystring);
+	
+	//Before load config file
+	std::cout << "myint: " 		<< myint		<< '\n';
+	std::cout << "mystring: "	<< mystring	<< '\n';
+	std::cout << "myfloat: "	<< myfloat	<< "\n\n";
+	
 	conf.loadFile("config.ini");
 	
-	std::cout << conf << '\n';
-
-	std::cout << myint << '\n';
+	//After load config file
+	std::cout << "myint: " 		<< myint		<< '\n';
+	std::cout << "mystring: "	<< mystring	<< '\n';
+	std::cout << "myfloat: "	<< myfloat	<< '\n';
 
 	return 0;
 }
