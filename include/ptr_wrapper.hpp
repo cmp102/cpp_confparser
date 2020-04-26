@@ -2,37 +2,66 @@
 #include <iostream>
 #include <sstream>
 #include <any>
+#include <vector>
 
 namespace confparser{
 
 struct ptr_wrapper{
 	public:
+	bool required {false};
 	//Constructor
 	template<typename T>
-	explicit ptr_wrapper(T& value) : 
-		dataptr{&value}, 
-		setDataPtr{&ptr_wrapper::setData<T>}
+	ptr_wrapper(T& value, bool req) : 
+		dataptr{&value},
+		required{req}
 	{}
 
+	template<typename T>
+	void setParseData(){
+		parseDataPtr = parseData<T>;
+	}
+
+
+	template<typename T>
+	void setParseIndexedData(){
+		parseIndexedDataPtr = parseIndexedData<T>;
+	}
+
 	//Calls the apropiate function to parse string to corresponent type
-	void setData(const std::string& value){
-		(this->*setDataPtr)(value);
+	void parseData(const std::string& value){
+		parseDataPtr(value, dataptr);
+	}
+
+	//Calls the apropiate function to parse string to corresponent type
+	void parseIndexedData(const std::string& value, unsigned	int pos){
+		parseIndexedDataPtr(value, dataptr, pos);
 	}
 
 	private: 	
 	void* dataptr {nullptr};
-	void(ptr_wrapper::*setDataPtr)(const std::string&) {nullptr};
+	void(*parseDataPtr)(const std::string&, void*) {nullptr};
+	void(*parseIndexedDataPtr)(const std::string&, void*, unsigned int) {nullptr};
 
 	template<typename T>
-	void setData(const std::string& value){
+	static void parseData(const std::string& value, void* valueptr){
 		std::stringstream svalue {value};
-		svalue >> *(static_cast<T*>(dataptr));
+		svalue >> *(static_cast<T*>(valueptr));
+	}
+
+	template<typename T>
+	static void parseIndexedData(const std::string& value, void* valueptr, unsigned	int pos){
+		std::stringstream svalue {value};
+		auto& vec = *(static_cast<std::vector<T>*>(valueptr));
+		if(!(vec.size()>pos)){
+			vec.resize(pos+1);
+		}
+		parseData<T>(value, &vec[pos]);
 	}
 };
 
 template<>
-inline void ptr_wrapper::setData<std::string>(const std::string& value){
-	*static_cast<std::string*>(dataptr) = value;
+inline void ptr_wrapper::parseData<std::string>(const std::string& value, void* valueptr){
+	*static_cast<std::string*>(valueptr) = value;
 }
 
 }

@@ -7,19 +7,37 @@
 
 namespace confparser{
 
-struct Config{
+#define bindParam(param) bindNamedParam(param,#param)
+#define bindRequiredParam(param) bindNamedParam(param,#param,true)
+
+#define bindIndexedParam(param) bindIndexedNamedParam(param,#param)
+#define bindIndexedRequiredParam(param) bindIndexedNamedParam(param,#param,true)
+
+
+struct ConfParser{
 	
 	public:
-	explicit Config() = default;
+	explicit ConfParser() = default;
 
 	void loadFile(std::string_view filename);
 
 	template<typename T>
-	void bindParam(std::string_view param, T& value){
-		params.emplace(param.data(),value);
+	ConfParser& bindNamedParam(T& value, std::string_view param, bool required = false){
+		ptr_wrapper pw{value, required};
+		pw.setParseData<T>();
+		params.emplace(param.data(), pw);
+		return *this;
 	}
 
-	friend std::ostream& operator<< (std::ostream& stream, const Config& cnf);
+	template<typename T>
+	ConfParser& bindIndexedNamedParam(std::vector<T>& value, std::string_view param, bool required = false){
+		ptr_wrapper pw{value, required};
+		pw.setParseIndexedData<T>();
+		params.emplace(param.data(), pw);
+		return *this;
+	}
+
+	friend std::ostream& operator<< (std::ostream& stream, const ConfParser& cnf);
 
 	private:
 	std::unordered_map<std::string, ptr_wrapper> params {};
