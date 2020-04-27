@@ -3,15 +3,12 @@
  * April 2020
 **/
 
+#include <sstream>
+#include <string>
+#include <vector>
 #include <confparser.hpp>
 
-std::stringstream& operator>>(std::stringstream& ss, std::vector<std::string>& vec){
-	std::string s;
 
-	while(getline(ss, s, ','))
-		vec.push_back(s);
-	return ss;
-}
 
 
 int main(){
@@ -20,6 +17,7 @@ int main(){
 	int			myint		= 0;
 	std::string	mystring	= "string";
 	float			myfloat	= 10;
+	bool			mybool = true;
 	std::vector<std::vector<std::string>> vecString;
 
 	confparser::ConfParser conf;
@@ -27,19 +25,30 @@ int main(){
 	conf	.bindParam				(myint		)
 			.bindParam				(myfloat		)
 			.bindRequiredParam	(mystring	)
-			.bindIndexedParam		(vecString	);
+			.bindIndexedParam		(vecString	)
+			.bindParam				(mybool		);
 	
 	//Before load config file
 	std::cout << "myint: " 		<< myint		<< '\n';
 	std::cout << "mystring: "	<< mystring	<< '\n';
-	std::cout << "myfloat: "	<< myfloat	<< "\n\n";
-	
+	std::cout << "myfloat: "	<< myfloat	<< "\n";
+	std::cout << "mybool: "	<< mybool	<< "\n\n";
+	for(auto& vec : vecString){
+		std::cout << "vec: [";
+		for(auto& val : vec){
+			std::cout << "\"" << val << "\" ";
+		}
+		std::cout << "]\n";
+	}
+
+
 	conf.loadFile("config.ini");
 	
 	//After load config file
 	std::cout << "myint: " 		<< myint		<< '\n';
 	std::cout << "mystring: "	<< mystring	<< '\n';
 	std::cout << "myfloat: "	<< myfloat	<< '\n';
+	std::cout << "mybool: "	<< mybool	<< "\n";
 
 	for(auto& vec : vecString){
 		std::cout << "vec: [";

@@ -37,8 +37,6 @@ struct ConfParser{
 		return *this;
 	}
 
-	friend std::ostream& operator<< (std::ostream& stream, const ConfParser& cnf);
-
 	private:
 	std::unordered_map<std::string, ptr_wrapper> params {};
 
